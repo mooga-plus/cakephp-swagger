@@ -47,14 +47,8 @@ class SwaggerTools
         if (Configure::read('Swagger.analyser')) {
             $swaggerOptions['analyser'] = Configure::read('Swagger.analyser');
         }
-        $swagger = \Swagger\scan(Configure::read("Swagger.library.$id.include"), $swaggerOptions);
-
-        // set object properties required by UI to generate the BASE URL
-        $swagger->host = $host;
-        if (empty($swagger->basePath)) {
-            $swagger->basePath = '/' . Configure::read('App.base');
-        }
-        $swagger->schemes = Configure::read('Swagger.ui.schemes');
+        #$swagger = \Swagger\scan(Configure::read("Swagger.library.$id.include"), $swaggerOptions);
+        $swagger = \OpenApi\Generator::scan([Configure::read("Swagger.library.$id.include")], $swaggerOptions);
 
         // write document to filesystem
         self::writeSwaggerDocumentToFile($filePath, $swagger);
@@ -74,7 +68,7 @@ class SwaggerTools
     {
         // we need to silence the warning so we can satisfy our Test by throwing without a warning interfering
         $fh = @fopen($path, 'w'); // phpcs:ignore
-        if (!$fh || !fwrite($fh, $content->__toString())) {
+        if (!$fh || !fwrite($fh, $content->toJson())) {
             throw new InternalErrorException('Error writing Swagger json document to filesystem');
         }
 

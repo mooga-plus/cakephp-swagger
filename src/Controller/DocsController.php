@@ -42,7 +42,7 @@ class DocsController extends AppController
         }
 
         $document = SwaggerTools::getSwaggerDocument($id, $this->request->host());
-        $this->jsonResponse($document);
+        $this->jsonResponse($document->toJson());
     }
 
     /**
